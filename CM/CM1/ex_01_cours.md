@@ -176,9 +176,7 @@ Output `4.000000000000001`
 ## erreur 26 test.hs ???
 ##### Les tuples 
 fsd et snd pour les couples 
-fst est la fonction qui pour un couple donne la première composante, et
-snd donne la 2e composante : par exemple fst (1,3) vaut 1 et snd (1,3)
-vaut 3.
+fst est la fonction qui pour un couple donne la première composante, et snd donne la 2e composante : par exemple fst (1,3) vaut 1 et snd (1,3) vaut 3.
 ```Haskell
 maxi ::(Integer, Integer)-> Integer
 maxi x = let a = fst x   
