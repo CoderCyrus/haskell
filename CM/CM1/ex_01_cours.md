@@ -1,5 +1,5 @@
 ## Programmation fonctionelle CM1
-==Evaluation conditionnel==
+##### Evaluation conditionnel
 ```Haskell
 f :: Integer -> Integer
 f n =  if n == 0 then 1
@@ -9,7 +9,7 @@ main = print (f 5)
 ```
 Output `120`
 
-==Filtrage par motif (Pattern matching)==
+##### Filtrage par motif (Pattern matching)
 ```Haskell
 f 0 = 1
 f n = n * f (n-1)
@@ -29,7 +29,7 @@ f x = (inc.square) x  -- ou juste f x = inc (square x)
 main = print( f 3 )
 ```
 Output `10`
-==Evaluation gradée==
+##### Evaluation gradée 
 ```Haskell
 signe n
     | n < 0     = -1
@@ -38,7 +38,7 @@ signe n
 main = print(signe 10)
 ```
 Output `1`
-==Fonction récursive terminale==
+##### Fonction récursive terminale 
 ```Haskell
 f' 0 r = r
 f' n r = f' (n-1) (n*r)
@@ -93,7 +93,7 @@ hpal n = if (r n) == n  -- calcule de fois
 main = print (hpal 454)
 ```
 Output `0`
-==Délcaration locale==
+##### Délcaration locale 
 ```haskell
 sommeCube x y = let  z = x + y in z*z*z
 main = print(sommeCube 2 1)
@@ -105,6 +105,35 @@ sommeCube x y = let  add u v = u +v
 main = print(sommeCube 2 1)
 ```
 Output `27`
+ ##### Plus de pattern matching 
+ ```haskell
+ data PossibleReel = Rien | Valeur Double deriving Show 
+ -- le nouveau type PossibleReel
+ -- constructeur de donnée Rien et Valeur
+ -- le constructeur Rien qui permet de construire un PossibleReel sans donner d'argument
+ -- le constructeur Valeur qui permet de construire un PossibleReel à partir d'un double
+
+-- fonction: inversion
+inversion :: Double -> PossibleReel
+inversion 0 = Rien 
+inversion x = Valeur (1 / x)
+
+-- fonction: opposePR
+opposePR :: PossibleReel -> PossibleReel
+opposePR Rien       = Rien 
+opposePR (Valeur x) = Valeur (-x)
+ ```
+
+```haskell
+main = print (inversion 2.9)
+```
+
+Output `Valeur 0.3448275862068966`
+```haskell
+main = print (opposePR (Valeur 2.2))
+```
+output `Valeur (-2.2)`
+
 #### Ex slide 22
 Ecrire une fonction et qui réalise le et logique entre deux Bool
 ```Haskell
@@ -114,7 +143,8 @@ et _ _ = False
 main = print(et True True)
 ```
 Output `True`
-#### Ex : Type akgébrique slide 23
+#### Ex : Type algébrique slide 23
+Nom de type commerce par MAJUSCULE
 ```Haskell
 data Point = Coord Double Double
 distance :: Point -> Point -> Double
@@ -144,9 +174,11 @@ main = print (permetre (FigCa (Coord 2.1 2.1)  (Coord 3.1 3.1)))
 ```
 Output `4.000000000000001`
 ## erreur 26 test.hs ???
-==Les tuples==
+##### Les tuples 
 fsd et snd pour les couples 
-### pourqoui ???? page 26
+fst est la fonction qui pour un couple donne la première composante, et
+snd donne la 2e composante : par exemple fst (1,3) vaut 1 et snd (1,3)
+vaut 3.
 ```Haskell
 maxi ::(Integer, Integer)-> Integer
 maxi x = let a = fst x   
@@ -154,19 +186,17 @@ maxi x = let a = fst x
              if a > b then a else b
 main =print (maxi (20,3))
 ```
-pattern matching 
+##### pattern matching 
 ```Haskell
 maxi ::(Integer, Integer)-> Integer
 maxi (a,b) = if a > b then a else b
 main =print (maxi (20,3))
 ```
 Output `20`
-### ???
+Pas que pour les couples, aussi pour plusieurs paramètres 
 ```Haskell
-Pas que pour les couples
 ror :: (Char, Char,Char) ->(Char, Char,Char)
-r(a,b,c) = (c,b,a)
-main = print (r)
+ror(a,b,c) = (c,b,a)
 ```
 ==Type: les enregistrements==
 ```haskell
@@ -184,7 +214,7 @@ main = let c1 = Coin "Coin" 0.5
 ```
 Output 
 `Oh le beau canard Coin d'envergure 0.5   Oh le beau canard Gaga d'envergure 0.3  `
-Types algébriques récursifs
+##### Types algébriques récursifs
 ### ??? commet tester
 ```haskell
 data Nat = Zero | Succ Nat

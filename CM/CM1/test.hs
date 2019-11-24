@@ -1,20 +1,18 @@
-data PossibleReel = Rien | Valeur Double  -- constructeur de donnée
+data PossibleReel = Rien | Valeur Double deriving Show -- constructeur de donnée
 
-------- pas de définition pour constructeur rein ? -------
 inversion :: Double -> PossibleReel
---inversion Rien = 0
 inversion 0 = Rien 
 inversion x = Valeur (1 / x)
--- Rien et Valeur sont *implicitement* définies avec ce type
-Rien :: PossibleReel
-Valeur :: Double -> PossibleReel
+--Rien et Valeur sont *implicitement* définies avec ce type
+--Rien :: PossibleReel
+--Valeur :: Double -> PossibleReel
 
 opposePR :: PossibleReel -> PossibleReel
---opposePR Rien = 0
-opposePR Rien       = Rien
+opposePR Rien       = Rien 
 opposePR (Valeur x) = Valeur (-x)
 
-main = print ( inversion 0)
+--main = print ( inversion 2.9)
+--main = print (opposePR (Valeur 2.2))
       
 -- Le type PossibleReel exite, sous la forme d'un type paramétré
 -- pour tout type a...

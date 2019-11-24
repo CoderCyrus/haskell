@@ -156,16 +156,22 @@
 -----------------------------
 ------- slide 29 ------------
 -----------------------------
-data Liste = Vide | Cons Integer Liste  --comme pointeur dans C
-somme :: Liste -> Integer
-somme Vide = 0
-somme (Head x l) = x + somme l --permettre de parcourir tous les élément dans la liste
+-- data Liste = Vide | Cons Integer Liste  --comme pointeur dans C
+-- somme :: Liste -> Integer
+-- somme Vide = 0
+-- somme (Head x l) = x + somme l --permettre de parcourir tous les élément dans la liste
 
-data ArbreBinaire = VideA |  Head Integer ArbreBinaire ArbreBinaire
-hauteur VideA = 0
-hauteur (Noeud x g d)= 1 + max (hauteur g) (hauteur d) --gauche et droit
-
-
+-- data ArbreBinaire = VideA |  Head Integer ArbreBinaire ArbreBinaire
+-- hauteur VideA = 0
+-- hauteur (Noeud x g d)= 1 + max (hauteur g) (hauteur d) --gauche et droit
 
 
+
+data Either a b = Left a | Right b deriving Show 
+safeTwice:: Int-> Either Int Int
+sateTwice n = if n > 300
+                then Left n
+                else Right (2*n)
+
+main = print (safeTwice(200))
 
