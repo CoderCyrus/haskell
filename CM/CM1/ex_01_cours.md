@@ -1,4 +1,6 @@
-## Programmation fonctionelle CM1
+## Programmation fonctionelle  Haskell
+---
+### I.Constructions de base
 ##### Evaluation conditionnel
 ```Haskell
 f :: Integer -> Integer
@@ -143,6 +145,9 @@ et _ _ = False
 main = print(et True True)
 ```
 Output `True`
+
+---
+### II.Type
 #### Ex : Type algébrique slide 23
 Nom de type commerce par MAJUSCULE
 ```Haskell
@@ -237,5 +242,128 @@ data ArbreBinaire = VideA |  Head Integer ArbreBinaire ArbreBinaire
 hauteur VideA = 0
 hauteur (Noeud x g d)= 1 + max (hauteur g) (hauteur d) --gauche et droit
 ```
+##### Types en Haskell : les listes
+```haskell
+-- les nombres paris inférieurs à n
+evens n = [ x+1 | x <- [1..(n-2)], odd x]
+```
+#### Ex Construire la liste des triplets slide 31
+#### comment présenter la sortie ?
+```haskell
+triple = [(a,b,c) | a<-[0..333], b<-[(a+1)..500], c<-[(b+1)..1000], a+b+c == 1000 , a^2+b^2 == c^2]  
+main = print triple
+```
+#### Ex ecrire une fonction reverse qui inverse une liste ? slide 32
+##### J listfct.hs ?
+```haskell
+reverseAux [] acc = acc
+reverseAux (x:xs) acc = reverseAux xs (x:acc) 
+
+rev x = reverseAux x []
+
+main = print (rev [1..10])
+```
+##### ex 1 delete 
+x is the first element (head) and xs is the rest of the list (tail).
+```haskell
+deleteL [] e = []
+deleteL (x:xs) e = if x==e then xs else x:(deleteL xs e)
+main = print(deleteL [1..10] 11)
+```
+##### ex 2 maximum
+```haskell
+maxL_aux [] x = x
+maxL_aux (x:xs) m = if x > m then maxL_aux xs x else maxL_aux xs m
+
+maxL:: [Integer] -> Integer -- obligé de spécifier le type pour que maxL [] marche
+maxL [] = error "maxL: La liste est vide"
+maxL (x : xs) = maxL_aux xs x
+
+main = print(maxL [1,5,3,2])
+```
+##### ex 3 ?
+Une focntion trimax qui réalise le tri par extraction du maximum dans une liste d'éntier
+```haskell
+deleteL [] e = []
+deleteL (x:xs) e = if x==e then xs else x:(deleteL xs e)
+
+maxL_aux [] x = x
+maxL_aux (x:xs) m = if x > m then maxL_aux xs x else maxL_aux xs m
+
+maxL::[Integer]->Integer-- obligé de spécifier le type pour que maxL [] marche
+maxL [] = error "maxL: La liste est vide"
+maxL (x:xs) = maxL_aux xs x
+
+? trimax_aux [] acc = acc
+? trimax_aux x acc = let m = maxL x in trimax_aux (deleteL x m) (m:acc)
+trimax x = trimax_aux x []
+
+main = print(trimax [1,5,3,2,7,8,6])
+```
+Output `[1,2,3,5,6,7,8]`
+##### Des focntions génériques sur des types algébriques génériques
+```haskell
+-- pour tout tyoe a 
+head :: [a] -> a
+head [] = error ("head: Empty list")
+head (x:xs) = x
+-- dans Data.Maybe
+listToMaybe::[a]->Maybe a
+lsitToMaybe [] = Nothing
+lsitToMaybe (x:xs) = Just x
+```
+---
+### III.Fonctions d'ordre supérieur
+##### Currying
+-Currying: all functions in Haskell really take only one argument. (one by one)
+-The process of creating intermediate functions when feeding arguments into a complex function is called currying 
+##### ? slide 37
+```haskell
+curry::((a,b)->c)->(a->(b->c))
+uncurry::(a->(b->c))->((a,b)->c)
+```
+#### Ex slide 37
+##### ex 1 Quel le type de map ?
+```haskell
+-- applique f à tous les éléments
+map _ [] = []
+map f (x:xs) = (f x):(map f xs)
+```
+```haskell
+map::(a->b)->[a]->[b]
+```
+##### ex 2 une fonction flip, avec son type 
+```haskell
+myflip::(a->b->c)->(b->a->c)
+
+myflip' f x y = f y x
+myflip f = myflip' f  -- inverse
+
+main = print(myflip (-) 1 3) -- output = 2
+```
+##### Application de fonction $
+---------------
+### IV.
+##### Evaluation non-stricte et foldS  51
+foldr --> liste infinie
+
+---
+### V.Entrée, sortie
+Le type paramétré `IO`
+##### ex slide 57
+```haskell
+ioLength :: IO Int
+ioLength = do
+    x <- getLine
+    return $ length x
+main = do
+    x<- ioLength
+    print x
+```
+```haskell
+ioLength = getLine >>= return.length
+main = ioLength >>= print
+```
+### VI.Généricité avancée
 
 
