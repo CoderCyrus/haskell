@@ -8,7 +8,7 @@ data Message = Mes [Integer]  deriving Show
 -- Q2
 stringToMessage str = Mes $ map (fromIntegral.ord) str
 messageToString (Mes msg) = map (chr.fromIntegral) msg
--- main = print $ messageToString $ stringToMessage "Hello"
+-- main = print $ messageToString  $ Mes [72,101,108,108,111]  -- output "Hello"
 
 -- Q3 padding
 pad size (Mes msg) = let r = size - (mod (length msg) size) in 
@@ -16,12 +16,14 @@ pad size (Mes msg) = let r = size - (mod (length msg) size) in
                 Mes(msg ++ replicate (fromIntegral size) (fromIntegral size))
             else 
                 Mes(msg ++ replicate (fromIntegral r) (fromIntegral r))
---main = print $ pad 5 (stringToMessage "Hello" )
+--main = print $ pad 5 (stringToMessage "Hello" )  --output Mes [72,101,108,108,111,5,5,5,5,5]
 
 -- Q4 unpadding 
+-- supprimer les chiffres ajoutés 
 unpadInt :: [Integer] -> Integer -> [Integer]
 unpadInt msg  0 = msg
 unpadInt (x:xs) padSize = unpadInt xs (padSize-1)
+-- reverse la table
 unpad :: Message -> Message
 unpad (Mes []) = (Mes [])
 unpad (Mes msg) = let (padSize:xReverse) =  reverse msg in Mes(reverse (unpadInt (padSize:xReverse) (fromIntegral padSize)))
@@ -47,9 +49,20 @@ ungroupBytes bsize n  = let a = (256^(bsize -1)) in let q = ( n `div` a) in q:(u
 groupN :: Int -> [Integer] -> [[Integer]]
 groupN bsize [] = []
 groupN bsize msg  = let res= splitAt bsize msg in [fst res] ++ groupN (bsize) (snd res) 
-main = print $ groupN 5 [1,2,3,4,5,6,7,8,9,10]
+-- main = print $ groupN 5 [1,2,3,4,5,6,7,8,9,10]  -- output [[1,2,3,4,5],[6,7,8,9,10]]
 
 -- Q8
+-- groupN groupBytes
+makeBlocks::Int-> Message -> Message
+makeBlocks bsize (Mes msg) = Mes(map groupBytes (groupN bsize msg))
+--main = print $  makeBlocks 2  (Mes [1,2,3,4])  -- output Mes [258,772]
 
+--Q9 
+-- [[a]] -> [a]
+-- Input: concat [[1,2,3], [1,2,3]] 
+-- Output: [1,2,3,1,2,3]
+splitBlocks::Int -> Message -> Message
+splitBlocks bsize (Mes msg) = Mes(concat(map (ungroupBytes bsize) msg ))
+--main = print $ splitBlocks 2 (Mes[258,772])
 
-
+-- Chiffrement et déchiffrement
