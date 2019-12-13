@@ -46,9 +46,9 @@ ungroupBytes bsize n  = let a = (256^(bsize -1)) in let q = ( n `div` a) in q:(u
 -- Q7 
 -- Input: splitAt 5 [1,2,3,4,5,6,7,8,9,10]
 -- Output: ([1,2,3,4,5],[6,7,8,9,10])
-groupN :: Int -> [Integer] -> [[Integer]]
+groupN :: Int -> [Integer] -> [[Integer]] -- liste dans la liste
 groupN bsize [] = []
-groupN bsize msg  = let res= splitAt bsize msg in [fst res] ++ groupN (bsize) (snd res) 
+groupN bsize msg  = let res = splitAt bsize msg in [fst res] ++ groupN (bsize) (snd res) 
 -- main = print $ groupN 5 [1,2,3,4,5,6,7,8,9,10]  -- output [[1,2,3,4,5],[6,7,8,9,10]]
 
 -- Q8
@@ -57,12 +57,12 @@ makeBlocks::Int-> Message -> Message
 makeBlocks bsize (Mes msg) = Mes(map groupBytes (groupN bsize msg))
 --main = print $  makeBlocks 2  (Mes [1,2,3,4])  -- output Mes [258,772]
 
---Q9 
+-- Q9 
 -- [[a]] -> [a]
 -- Input: concat [[1,2,3], [1,2,3]] 
 -- Output: [1,2,3,1,2,3]
 splitBlocks::Int -> Message -> Message
 splitBlocks bsize (Mes msg) = Mes(concat(map (ungroupBytes bsize) msg ))
---main = print $ splitBlocks 2 (Mes[258,772])
+-- main = print $ splitBlocks 2 (Mes[258,772])  -- output Mes [1,2,3,4]
 
 -- Chiffrement et déchiffrement
