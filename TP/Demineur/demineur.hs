@@ -144,13 +144,13 @@ applyij f i j xss = applyi (applyi f j ) i xss
 -- const une fonction constante
 -- pass le status Covered à Uncovered
 uncover::Int -> Int -> Grid -> Grid
-uncover i j (Gird l) = case l!!i!!j of 
+uncover i j (Grid l) = case l!!i!!j of 
     Uncovered _ -> (Grid l)
 
     -- 0 mine découvrir les cases autour
     Covered 0 _ _ -> let g' = Grid $ applyij (const $ Uncovered 0) i j l in  -- on découvre la case actuelle et mettre en 0 (0 mine)
-    let voisins = [(i+i', j+j') | i'<-[-1,0,1], j'<-[-1,0,1], i+i'>=0, j+j'>=0, i+i'<(length l), j+j'<(length $ head l), (i+i', j+j') /= (0,0)] in  -- TODO
-    foldl' (\grid (i', j') -> uncover i' j' grid) g' voisins  -- on découvre récursivement tous les voisins
+                     let voisins = [(i+i', j+j') | i'<-[-1,0,1], j'<-[-1,0,1], i+i'>=0, j+j'>=0, i+i'<(length l), j+j'<(length $ head l), (i+i', j+j') /= (0,0)] in  -- TODO
+                     foldl' (\grid (i', j') -> uncover i' j' grid) g' voisins  -- on découvre récursivement tous les voisins
 
     -- n mines découvrir les cases autour
     Covered n _ _ -> Grid $ applyij (\(Covered n _ _)-> Uncovered n) i j l
@@ -163,13 +163,69 @@ covIndic::Cell -> Int
 covIndic Covered _ _ _ = 1
 covIndic Uncovered _ = 0
 
--- Q21
+-- Q21 won
 -- sum
-won::Int -> Gird -> Bool
+-- on a gagné quand le nombre de cellules couvertes = nombre de mines
+won::Int -> Grid -> Bool
 won n (Grid l) = (sum $ map (sum.(map covIndic)) l) == n
 
 -- Q22
-toggleFlag::Cell -> 
+toggleFlag::Cell -> Cell
+toggleFlag Covered n mine flag = Covered n min (not flag)
+toggleFlag c = c -- ne fait rien sur les autres cellules
+
+-----------------------------
+--- maybeFindMine TODO
+-----------------------------
+
+
+
+-- Q23 version B
+-- Compléter la fonction loop
+loop :: Int -> Int -> Int -> Grid -> IO ()
+loop i j n b@(Grid xs) -- le paramètre b se décompose en (Grid xs)
+    | won n b = putStrLn "Victoire !" 
+    | otherwise = do  
+        -- affiche la grille avec la case i, j sélectionnée
+        putStrLn $ show $ Grid $ applyij (const Selected) i j xs 
+        -- lit un caractère
+        c <- getChar
+        case c of
+            'i'       -> loop (max (i - 1) 0) j n b -- bouge le curseur vers le haut
+            'k'       -> loop (min (i + 1) ((length xs) - 1)) j n b -- bouge le curseur vers le bas
+            'j'       -> loop i (max (j - 1) 0) n b -- bouge le curseur vers la gauche
+            'l'       -> loop i (min (j + 1) ((length (xs!!0)) - 1)) n b -- bouge le curseur vers la droite
+            'f'       -> loop i j n (Grid $ applyij toggleFlag i j xs) -- pose ou enlève un drapeau sur la case i, j
+            'u'       -> case (xs!!i!!j) of 
+                            Covered _ True _ -> putStrLn "BOOM ! Défaite..."
+                            _ -> loop i j n (uncover i j b) -- découvre la case i, j; BOUM ?
+            't'       -> case (maybeFindMine b) of
+                            Nothing -> loop i j n b
+                            Just (i', j') -> loop i' j' n b
+            otherwise -> loop i j n b -- ne fait rien    
+            
+-- Q24
+main :: IO () 
+main = do
+    -- désactive l’attente de la touche entrée pour l’acquisition
+    hSetBuffering stdin NoBuffering
+    -- désactive l’écho du caractère entré sur le terminal
+    hSetEcho stdin False
+    -- récupère deux StdGen pour la génération aléatoire
+    g <- newStdGen
+    g' <- newStdGen
+    -- nombre de mines, lignes, colonnes
+    let nmines = 5
+    let l = 7
+    let c = 10
+    -- créer la grille, ajouter les mines, mettre à jour les voisins
+    let minesCoord = randSet nmines g g' l c
+    let b' = grid l c minesCoord
+    let b = updateGrid b' (neighbourMap b')
+    loop 0 0 nmines b -- démarrer la REPL
+         
+
+
     
 
                

@@ -133,7 +133,7 @@
 -- -- maxL (x:xs) = maxL x (maxL xs)
 
 -- main = print(maxL [1,5,3,2])
---main = print(maxL [])
+-- main = print(maxL [])
 
 -- 2.3
 -- trimax_aux [] acc = acc

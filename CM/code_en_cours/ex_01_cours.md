@@ -81,7 +81,7 @@ raux n x = if n == 0
 r n = raux n 0
 main = print (r 123)
 ```
-Output `123`
+Output `321`
 ```Haskell
 r ::Integer->Integer    -- fonction donnée
 raux n x = if n == 0
@@ -342,6 +342,63 @@ myflip f = myflip' f  -- inverse
 main = print(myflip (-) 1 3) -- output = 2
 ```
 ##### Application de fonction $
+
+#####  slide 38 fonctions anonymes
+```haskell
+main = print $ map (\x -> x+1) [100]  -- output [101]
+
+add:: Integer -> Integer -> Integer
+add  = (\x y -> x+y)
+main = print $ add 10 11  -- output 21
+```
+##### Récursion sur les listes : map
+##### 41  Ex en utilisant map, écrire une fonction an qui donne la liste de toutes les anagrammes d’un mot
+```haskell
+import Data.List -- pour delete
+an::String->[String]
+an "" = [""]
+an xs = concat $ map (\c -> map (c:) (an (delete c xs))) xs  
+-- c est une lettre 
+
+main = print(an "abc")
+-- output ["abc","acb","bac","bca","cab","cba"]
+```
+##### concat 
+##### delete 
+
+##### 42 Récursion sur les listes : filter
+```haskell
+divise n k = mod n k == 0 -- True if k|n
+diviseurs n = filter (divise n) [1..n]
+diviseurs n = filter ((==0).(mod n)) [1..n] -- Le point est la composition mathématique
+
+premiers n = filter (\x -> length (diviseurs x) == 2) [2..n]
+
+main = print(premiers 15)
+```
+##### 43 Récursion sur les listes : folds
+##### 46 EX
+```haskell
+sumX xs = foldl (+) 0 xs
+main = print $ sumX [1,23]
+
+maxL::Ord a => [a] -> a
+maxL xs = foldl1 max xs 
+main = print(maxL [1,5,3])  -- output 5
+
+-- indique si tous les éléments sont vrais
+andL = foldr (&&) True
+main = print(andL [True, False, True])
+
+-- qui indique si au moins un élément de la liste satisfait un prédicat donné
+f x = x == 0
+anyL f xs =  or $ map f xs
+-- or xs = foldl (||) False xs
+main = print $ anyL f [1,1,1]
+
+```
+
+
 ---------------
 ### IV.
 ##### Evaluation non-stricte et foldS  51
