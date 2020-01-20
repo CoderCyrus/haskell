@@ -396,18 +396,34 @@ anyL f xs =  or $ map f xs
 -- or xs = foldl (||) False xs
 main = print $ anyL f [1,1,1]
 
+-- concat qui concatène une liste de listes 
+concatL  = foldl (++) []
+main = print $ concatL [[1,2], [3,4,5], [6]]
+-- ou main = print $ concat [[1,2], [3,4,5], [6]]
 ```
 
-
 ---------------
-### IV.
+### IV. Méthodes d’évaluation
+
+##### 49 
+-- le 1234567e nombre de Fibonacci
 ##### Evaluation non-stricte et foldS  51
 foldr --> liste infinie
 
 ---
 ### V.Entrée, sortie
-Le type paramétré `IO`
-##### ex slide 57
+Le type paramétré `IO`  monade
+##### ex 51
+```haskell
+-- entrer coin affiche coin nioc
+main::IO ()
+main = getLine >>= (\x->putStrLn(x ++ " " ++ reverse x))
+-- E macc S macc ccam
+
+main = getLine >>= (\x -> getLine >>= (\y -> putStrLn(y++ " "++ x)))
+````
+##### ex slide 57  
+###### une fonction ioLength qui donne la longueur d’une chaîne de caractères lue au clavier
 ```haskell
 ioLength :: IO Int
 ioLength = do
@@ -417,10 +433,197 @@ main = do
     x<- ioLength
     print x
 ```
+Autre solution
 ```haskell
 ioLength = getLine >>= return.length
 main = ioLength >>= print
 ```
+##### ex 58 Le chiffre de César 
+```haskell
+import Data.Char
+-- ord :: Char -> Int
+-- chr :: Int -> Char
+cesar n mot = map ( \x -> chr $ (ord 'a' + ( mod (ord  x - ord 'a' + n )  26 ) ))  mot
+main = print (cesar 13 "coin") --output "pbva"
+
+-- la fonction main permettant l’acquisition de l’entier et de la chaîne de caractères
+main = do 
+    x <- getLine
+    let n = (read x) :: Int  -- pour être sûr que le type de conversation est bien
+    mot <- getLine
+    putStrLn $ cesar n mot
+
+-- la fonction main pour forcer l’utilisateur à entrer un entier compris entre 1 et 25
+getIntBorne :: IO Int
+getIntBorne = do
+    putStrLn "Entrez une valeur "
+    x <- getLine
+    let n =(read x) ::Int
+    if n > 0 && n <= 25 then return n
+                        else getIntBorne
+main = do 
+    x <- getLine
+    mot <- getLine
+    putStrLn $ cesar n mot
+```
+```haskell
+ess = [print "Coin", print "Meuh", print "Miaou"]
+main = do
+        ess!!2         -- output  Miaou
+        sequence_ ess  -- output tout
+```
 ### VI.Généricité avancée
+Typeclass
+```haskell
+-- pour tout type numérique a 
+product::Num a=>[a]->a
+product = foldl (*) 1
+```
+##### ex 64  
+##### 数列 <-  
+##### concatMap f == concat.(map f)
+Il y aura une questions sur les monades et les foncteurs
+##### Maybe, muni de mfmap, est appelé un foncteur 
+```haskell
+-- incrément 增量
+-- décrément 递减
+-- inversion 倒数
+import Data.Maybe
+data Expr a = Val a |  Inc (Expr a) | Dec (Expr a) | Inv (Expr a) | Neg (Expr a)
+
+evaluate::(Fractional a)  => Expr  a -> a
+evaluate (Val a) = a
+evaluate (Inc e) = evaluate e + 1
+evaluate (Dec e) = evaluate e - 1
+evaluate (Inv e ) = 1 / (evaluate e)
+evaluate (Neg e) = - (evaluate e)
+-- main = print $ evaluate $ Inc $  Val  4
+-- main = print $ evaluate $ Inv 0
+
+isZero::(Eq a,Num a)=> (Maybe a) -> Bool
+isZero Nothing = False      -- Nothing  et Just viennnet de Data.Maybe
+isZero (Just x) = (x == 0)
+
+mevaluate::(Eq a, Fractional a) => Expr a -> Maybe a
+mevaluate (Val a) = Just a
+mevaluate (Inc e) = let res = mevaluate e in 
+                    if isNothing res then Nothing
+                    else Just (fromJust res + 1)
+mevaluate (Dec e) = let res = mevaluate e in 
+                    if isNothing res then Nothing
+                    else Just (fromJust res - 1)
+mevaluate (Inv e) = let res = mevaluate e in 
+                    if (isNothing res) || (isZero res) then Nothing
+                    else Just (1 / (fromJust  res))
+mevaluate (Neg e) = let res = mevaluate e in 
+                    if isNothing res then Nothing
+                    else Just (negate (fromJust res))
+
+-- main = print $ mevaluate $ Inv(Val(0))
+
+-- ordre supérieur mfmap évolution 
+mfmap::(a->b) -> Maybe a -> Maybe b
+mfmap _ Nothing = Nothing
+mfmap op (Just x) = Just (op x)
+
+mevaluate:: (Eq a, Fractional a) => Expr a -> Maybe a 
+mevaluate (Val a) = Just a
+mevaluate (Inc e) = mfmap (+1) (mevaluate e)
+mevaluate (Dec e) = mfmap (subtract 1) (mevaluate e)
+mevaluate (Inv e )= let res = mevaluate e in 
+                    if isZero res then Nothing 
+                    else mfmap (\x -> 1 / x) res
+main = print $ mevaluate $ Inv(Val(0))
+```
+##### ex 65
+fmap doit vérifier les propriétés suivantes : 
+1. fmap id == id
+2. fmap (f.g) == (fmap f).(fmap g)
+```haskell
+-- la fonction fmap pour le constructeur de type [] 
+myfmap:: (a->b) -> [a] -> [b]
+myfmap f [] = []
+myfmap f (x:xs) = (f x) : (fmap f xs)
+
+--  la fonction fmap pour le constructeur de type r->
+myfmap :: (a->b) -> (r->a) -> (r->b)
+myfmap f g = f . g
+```
+```haskell
+import Data.Maybe
+data Expr a = Val a | Add (Expr a) (Expr a) | Sub (Expr a) (Expr a) | Mul (Expr a) (Expr a) | Div (Expr a) (Expr a) deriving Show
+
+mliftA2::(a->b->c)->Maybe a->Maybe b->Maybe c
+mliftA2 _ Nothing _ = Nothing 
+mliftA2 _ _ Nothing = Nothing
+mliftA2 f (Just a) (Just b) = Just $ f a b
+
+isZero::(Eq a,Num a) => (Maybe a) -> Bool
+isZero Nothing = False
+isZero (Just x) = (x == 0)
+
+mevaluate::(Eq a,Fractional a) => Expr a -> Maybe a
+mevaluate (Val x) = Just x
+mevaluate (Add e1 e2) = mliftA2 (+) (mevaluate e1) (mevaluate e2)
+mevaluate (Sub e1 e2) = mliftA2 (-) (mevaluate e1) (mevaluate e2)
+mevaluate (Mul e1 e2) = mliftA2 (*) (mevaluate e1) (mevaluate e2)
+mevaluate (Div e1 e2) = let res2 = mevaluate e2 in 
+                         if isZero res2 then Nothing
+                         else mliftA2 (/) (mevaluate e1) res2
+```
+##### ex 68 Foncteur applicatif (applicative functor)
+```haskell
+-- définir apm 
+-- apm :: Maybe (a -> b) -> Maybe a -> Maybe b
+apm::Maybe(a->b)->Maybe a->Maybe b
+apm Nothing _ = Nothing
+apm _ Nothing = Nothing
+apm (Just f) (Just a) = Just $ f a
+
+-- remplacer mliftA2 par mfmap et apm
+import Data.Maybe
+data Expr a = Val a | Add (Expr a) (Expr a) | Sub (Expr a) (Expr a) | Mul (Expr a) (Expr a) | Div (Expr a) (Expr a) | Add3 (Expr a) (Expr a) (Expr a) deriving Show
+
+mfmap::(a->b) -> Maybe a -> Maybe b
+mfmap _ Nothing = Nothing
+mfmap op (Just x) = Just $ op x
+
+mevaluate (Add e1 e2) = apm $ mfmap ((+) (mevaluate e1)) (mevaluate e2)
+
+-- un opérateur d’addition à 3 éléments 
+add3 x y z = x + y + z
+mevaluate (Add3 e1 e2 e3) = mfmap add3 e1 `apm` e2 `apm` e3
+```
+```haskell
+mfmap (+) (Maybe 1) ‘apm‘ Nothing
+```
+##### ex 70
+```haskell
+-- Définir fmap en fonction de pure et <*>
+fmap::(a->b) -> m a -> m b
+pure::a -> m a
+ap::m (a->b) -> m a -> m b 
+fmap f x = ap (pure f) x -- pure f <*> x
+
+
+pure::a->(r->a) 
+pure x = (\_ -> x)
+
+(<*>)::(r->(a->b))->(r->a)->(r->b)
+-- exemple : f <*> u = (\x -> f x (u x))
+
+--Donner une expression sans variable ni λ (point-free) de la fonction f x = (cos x) * x
+f = (*) <*> cos
+g = pure (*) <*> cos <*> sin -- redécomposer les fonctions pour comprendre
+```
+##### ex 75 
+Définir fmap à partir de >>= et return
+```haskell
+return::a-> ma
+(>>=)::m a -> (a -> mb) -> m b
+
+fmap::(a->b)->(m a)->(m b)
+fmap f x = x >>= return.f 
+```
 
 

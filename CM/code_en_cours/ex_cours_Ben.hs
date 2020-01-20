@@ -220,20 +220,3 @@
 
 
 
-
-
-deleteL [] e = []
-deleteL (x:xs) e = if x==e then xs else x:(deleteL xs e)
-
-maxL_aux [] x = x
-maxL_aux (x:xs) m = if x > m then maxL_aux xs x else maxL_aux xs m
-
-maxL::[Integer]->Integer-- obligé de spécifier le type pour que maxL [] marche
-maxL [] = error "maxL: La liste est vide"
-maxL (x:xs) = maxL_aux xs x
-
-trimax_aux [] acc = acc
-trimax_aux x acc = let m = maxL x in trimax_aux (deleteL x m) (m:acc)
-trimax x = trimax_aux x []
-
-main = print(trimax [1,5,3,2,7,8,6])

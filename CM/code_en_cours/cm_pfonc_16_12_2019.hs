@@ -18,7 +18,7 @@
 -- main = print $ evaluate $ Inv(Val(0))
 
 -- 4
--- isZero::(Eq a) => (Num a) => (Maybe a) -> Bool
+-- isZero::(Eq a,Num a) => (Maybe a) -> Bool
 -- isZero Nothing = False
 -- isZero (Just x) = (x == 0)
 
@@ -74,7 +74,7 @@
 -- mliftA2 _ _ Nothing = Nothing
 -- mliftA2 f (Just a) (Just b) = Just $ f a b
 
--- isZero::(Eq a) => (Num a) => (Maybe a) -> Bool
+-- isZero::(Eq a,Num a) => (Maybe a) -> Bool
 -- isZero Nothing = False
 -- isZero (Just x) = (x == 0)
 
@@ -108,18 +108,18 @@ mfmap op (Just x) = Just $ op x
 mevaluate (Add e1 e2) = apm $ mfmap ((+) (mevaluate e1)) (mevaluate e2)
 
 -- q3/4
+-- 递归
 add3 x y z = x + y + z
 mevaluate (Add3 e1 e2 e3) = mfmap add3 e1 `apm` e2 `apm` e3
-
 
 -----------------------------
 ---------- Diapo 70 ---------
 -----------------------------
+-- Définir fmap en fonction de pure et <*>
 fmap::(a->b) -> m a -> m b
 pure::a -> m a
-ap::m (a->b) -> m a -> m b
+ap::m (a->b) -> m a -> m b 
 fmap f x = ap (pure f) x -- pure f <*> x
-
 
 -----------------------------
 ---------- Diapo 71 ---------
